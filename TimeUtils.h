@@ -31,5 +31,6 @@ public:
     void start();
     void markCheckpoint(std::string name);
     void stop();
+    double getCheckpointTime(TimerCheckpoint checkpoint);
     void printTableRow(bool asOverwrite = true);
 };

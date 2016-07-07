@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <map>
+#include <iomanip>
 #include <opencv2/opencv.hpp>
 
 TimerManager::TimerManager()
@@ -61,15 +62,33 @@ void TimerManager::printTableRow(bool asOverwrite)
     if (asOverwrite)
         printf("\r");
 
+    double totalTime = getCheckpointTime(checkpoints[TOTAL_CHECKPOINT_NAME]);
+
     for (std::string name : orderedNames)
     {
-        TimerCheckpoint checkpointData = checkpoints[name];
-        int64 localStartTime = checkpointData.relativeTo == nullptr ? startTime : checkpointData.relativeTo->endTime;
-        double totalTime = (checkpointData.endTime - localStartTime) / ((double) cvGetTickFrequency()*1000.);
+        //(std::to_string(checkpointTime) + std::to_string(std::round()) + "%").c_str()
 
-        printf("%*d ", name.size(), (int)totalTime);
+        if (name == TOTAL_CHECKPOINT_NAME)
+        {
+            printf("%*d ", (int)name.size(), (int)totalTime);
+        }
+        else
+        {
+            double checkpointTime = getCheckpointTime(checkpoints[name]);
+
+            std::ostringstream timeStr;
+            timeStr << std::setprecision(3) << checkpointTime / totalTime * 100 << "%";
+
+            printf("%*s ", (int)name.size(), timeStr.str().c_str());
+        }
     }
 
     if (!asOverwrite)
         printf("\r\n");
+}
+
+double TimerManager::getCheckpointTime(TimerCheckpoint checkpoint)
+{
+    int64 localStartTime = checkpoint.relativeTo == nullptr ? startTime : checkpoint.relativeTo->endTime;
+    return (checkpoint.endTime - localStartTime) / ((double)cvGetTickFrequency()*1000.);
 }

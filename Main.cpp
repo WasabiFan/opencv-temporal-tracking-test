@@ -236,7 +236,7 @@ int main()
             normalize(targetColorHistogram, targetColorHistogram, 0, 255, NORM_MINMAX);
 
             // TODO: Re-write histogram render for 2d histogram with sat
-            std::cout << targetColorHistogram << std::endl;
+            //std::cout << targetColorHistogram << std::endl;
 
             if (!includeSatInHist)
             {
@@ -291,8 +291,8 @@ int main()
         else
         {
             timers.markCheckpoint(BACK_PROJECT_CHECKPOINT);
-            timers.markCheckpoint(CAM_SHIFT_CHECKPOINT);
             timers.markCheckpoint(BLOB_DETECT_CHECKPOINT);
+            timers.markCheckpoint(CAM_SHIFT_CHECKPOINT);
             timers.markCheckpoint(RENDER_CHECKPOINT);
         }
 
