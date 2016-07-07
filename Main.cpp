@@ -2,7 +2,9 @@
 #include <opencv2/highgui.hpp>
 #include <memory>
 #include <iostream>
+
 #include "TimeUtils.h"
+#include "FpsCounter.h"
 
 using namespace cv;
 
@@ -16,6 +18,7 @@ using namespace cv;
 
 #define CAPTURE_CHECKPOINT "Capture"
 #define THRESH_CHECKPOINT "Threshold"
+#define CVT_COLOR_CHECKPOINT "Cvt color"
 #define BACK_PROJECT_CHECKPOINT "Back project"
 #define CAM_SHIFT_CHECKPOINT "Cam shift"
 #define BLOB_DETECT_CHECKPOINT "Blob detect"
@@ -145,15 +148,21 @@ int main()
         sMin = 0, sMax = 255,
         vMin = 0, vMax = 255;
 
+    // These must start as false, otherwise the trackbar won't match the value.
     bool includeSatInHist = false;
+    bool enableThreshold = false;
+    bool disableImshow = false;
 
     TimerManager timers;
     timers.addCheckpoint(CAPTURE_CHECKPOINT);
-    timers.addCheckpoint(THRESH_CHECKPOINT, CAPTURE_CHECKPOINT);
+    timers.addCheckpoint(CVT_COLOR_CHECKPOINT, CAPTURE_CHECKPOINT);
+    timers.addCheckpoint(THRESH_CHECKPOINT, CVT_COLOR_CHECKPOINT);
     timers.addCheckpoint(BACK_PROJECT_CHECKPOINT, THRESH_CHECKPOINT);
     timers.addCheckpoint(BLOB_DETECT_CHECKPOINT, BACK_PROJECT_CHECKPOINT);
     timers.addCheckpoint(CAM_SHIFT_CHECKPOINT, BLOB_DETECT_CHECKPOINT);
     timers.addCheckpoint(RENDER_CHECKPOINT, CAM_SHIFT_CHECKPOINT);
+
+    FpsCounter fpsCounter = FpsCounter(10);
 
     VideoCapture capture(0);
     namedWindow("Source", CV_WINDOW_NORMAL);
@@ -169,6 +178,8 @@ int main()
     createTrackbar("V min", "Config", &vMin, 255);
     createTrackbar("V max", "Config", &vMax, 255);
     createTrackbar("Enable sat", "Config", nullptr, 1, setBoolCallback, &includeSatInHist);
+    createTrackbar("Enable thresh", "Config", nullptr, 1, setBoolCallback, &enableThreshold);
+    createTrackbar("Disable imshow", "Config", nullptr, 1, setBoolCallback, &disableImshow);
 
     Rect* selectedTarget = nullptr;
     setMouseCallback("Source", onMouse, &selectedTarget);
@@ -213,15 +224,19 @@ int main()
     for(uint32_t frameNumber = 0; capture.isOpened(); frameNumber++)
     {
         timers.start();
+        fpsCounter.addFrameTimestamp();
 
         capture >> sourceFrame;
 
         timers.markCheckpoint(CAPTURE_CHECKPOINT);
 
         //medianBlur(sourceFrame, sourceFrame, 5);
-        // TODO: Separate color conversion from thresh
         cvtColor(sourceFrame, hsvFrame, CV_BGR2HSV);
-        inRange(hsvFrame, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), threshFrame);
+
+        timers.markCheckpoint(CVT_COLOR_CHECKPOINT);
+
+        if(enableThreshold)
+            inRange(hsvFrame, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), threshFrame);
 
         timers.markCheckpoint(THRESH_CHECKPOINT);
 
@@ -230,7 +245,7 @@ int main()
             // TODO: Transition selection code to smart_ptr
             //printf("Updating target histogram with rect (x: %d, y: %d) (w: %d, h: %d)\r\n", selectedTarget->x, selectedTarget->y, selectedTarget->width, selectedTarget->height);
             Mat sourceRoi = Mat(hsvFrame, *selectedTarget);
-            Mat maskRoi = Mat(threshFrame, *selectedTarget);
+            Mat maskRoi = threshFrame.empty() ? Mat() : Mat(threshFrame, *selectedTarget);
 
             calcHist(&sourceRoi, 1, histogramChannels, maskRoi, targetColorHistogram, includeSatInHist ? 2 : 1, histogramNumBins, histogramRanges);
             normalize(targetColorHistogram, targetColorHistogram, 0, 255, NORM_MINMAX);
@@ -253,7 +268,8 @@ int main()
         if (!targetColorHistogram.empty() && (targetColorHistogram.cols == 1) == !includeSatInHist)
         {
             calcBackProject(&hsvFrame, 1, histogramChannels, targetColorHistogram, backprojFrame, histogramRanges);
-            backprojFrame &= threshFrame;
+            if(!threshFrame.empty())
+                backprojFrame &= threshFrame;
 
             erode(backprojFrame, backprojFrame, Mat(), Point(-1, -1), 3);
             dilate(backprojFrame, backprojFrame, Mat(), Point(-1, -1), 3);
@@ -278,15 +294,19 @@ int main()
 
             timers.markCheckpoint(CAM_SHIFT_CHECKPOINT);
 
-            for (auto trackedTarget : trackedTargets)
+            if (!disableImshow)
             {
-                if (trackedTarget->lastTrackedPose.size.area() > 0)
-                    ellipse(sourceFrame, trackedTarget->lastTrackedPose, Scalar(255, 0, 255), 1);
+                for (auto trackedTarget : trackedTargets)
+                {
+                    if (trackedTarget->lastTrackedPose.size.area() > 0)
+                        ellipse(sourceFrame, trackedTarget->lastTrackedPose, Scalar(255, 0, 255), 1);
+                }
             }
 
             timers.markCheckpoint(RENDER_CHECKPOINT);
 
-            imshow("Backprojected frame", backprojFrame);
+            if(!disableImshow)
+                imshow("Backprojected frame", backprojFrame);
         }
         else
         {
@@ -299,8 +319,14 @@ int main()
         timers.stop();
         timers.printTableRow();
 
-        imshow("Source", sourceFrame);
-        imshow("Thresh", threshFrame);
+        printf(" \t(%.1f FPS)", fpsCounter.getFps());
+
+        if (!disableImshow || targetColorHistogram.empty())
+            imshow("Source", sourceFrame);
+
+        if (!disableImshow && enableThreshold)
+            imshow("Thresh", threshFrame);
+
         waitKey(1);
     }
 }
