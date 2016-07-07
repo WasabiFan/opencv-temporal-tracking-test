@@ -40,7 +40,7 @@ bool operator==(KeyPoint const& lhs, KeyPoint const& rhs)
 
 static void setBoolCallback(int pos, void* userData)
 {
-    *(bool*)userData = pos;
+    *(bool*)userData = pos != 0;
 }
 
 static void onMouse(int event, int x, int y, int flags, void* userData)
