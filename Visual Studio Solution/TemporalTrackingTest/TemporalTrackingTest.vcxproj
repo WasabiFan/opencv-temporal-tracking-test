@@ -19,11 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ColorBasedTargetDetector.cpp" />
     <ClCompile Include="..\..\FpsCounter.cpp" />
     <ClCompile Include="..\..\Main.cpp" />
     <ClCompile Include="..\..\TimeUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\ColorBasedTargetDetector.h" />
     <ClInclude Include="..\..\FpsCounter.h" />
     <ClInclude Include="..\..\TimeUtils.h" />
   </ItemGroup>
