@@ -21,12 +21,17 @@
   <ItemGroup>
     <ClCompile Include="..\..\ColorBasedTargetDetector.cpp" />
     <ClCompile Include="..\..\FpsCounter.cpp" />
+    <ClCompile Include="..\..\DesktopTest.cpp" />
+    <ClCompile Include="..\..\HeadlessApp.cpp" />
     <ClCompile Include="..\..\Main.cpp" />
     <ClCompile Include="..\..\TimeUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ColorBasedTargetDetector.h" />
+    <ClInclude Include="..\..\DesktopTest.h" />
     <ClInclude Include="..\..\FpsCounter.h" />
+    <ClInclude Include="..\..\HeadlessApp.h" />
+    <ClInclude Include="..\..\IMainApplication.h" />
     <ClInclude Include="..\..\TimeUtils.h" />
   </ItemGroup>
   <ItemGroup>

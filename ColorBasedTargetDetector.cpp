@@ -1,5 +1,13 @@
 #include "ColorBasedTargetDetector.h"
 
+/*
+NOTES:
+
+- Dilate and erode dramatically decrease blob time
+- Can do blobs every few frames to minimize slowdown
+- Blur removed to speed up frame time. Can be added back if desired.
+*/
+
 bool operator==(cv::KeyPoint const& lhs, cv::KeyPoint const& rhs)
 {
     return lhs.pt == rhs.pt
