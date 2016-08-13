@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\ColorBasedTargetDetector.cpp" />
+    <ClCompile Include="..\..\AppParamsManager.cpp" />
     <ClCompile Include="..\..\FpsCounter.cpp" />
     <ClCompile Include="..\..\DesktopTest.cpp" />
     <ClCompile Include="..\..\HeadlessApp.cpp" />
@@ -29,6 +30,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\ColorBasedTargetDetector.h" />
     <ClInclude Include="..\..\DesktopTest.h" />
+    <ClInclude Include="..\..\AppParamsManager.h" />
     <ClInclude Include="..\..\FpsCounter.h" />
     <ClInclude Include="..\..\HeadlessApp.h" />
     <ClInclude Include="..\..\IMainApplication.h" />

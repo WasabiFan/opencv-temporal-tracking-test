@@ -10,15 +10,17 @@ using namespace cv;
 
 void HeadlessApp::initialize()
 {
-    // TODO: Load settings
+    AppParamsManager::loadParams("config.xml", appParams);
+    if (!this->appParams.targetHistogram.empty())
+        this->targetDetector.updateTargetHistogram(appParams.targetHistogram);
 }
 
 void HeadlessApp::processFrame(uint32_t frameNumber, cv::Mat newFrame)
 {
     cvtColor(newFrame, hsvFrame, CV_BGR2HSV);
 
-    if (enableThreshold)
-        inRange(hsvFrame, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), threshFrame);
+    if (appParams.enableHsvThreshold)
+        inRange(hsvFrame, Scalar(appParams.threshHMin, appParams.threshSMin, appParams.threshVMin), Scalar(appParams.threshHMax, appParams.threshSMax, appParams.threshVMax), threshFrame);
 
     if (targetDetector.hasTargetTraining())
     {

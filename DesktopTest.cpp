@@ -6,6 +6,7 @@
 #include "TimeUtils.h"
 #include "ColorBasedTargetDetector.h"
 #include "DesktopTest.h"
+#include "AppParamsManager.h"
 
 using namespace cv;
 
@@ -77,7 +78,10 @@ void DesktopTest::renderHueHistogram(Mat hueHistogram, Mat& histogramRender, int
 
 void DesktopTest::initialize()
 {
-    
+    // TODO: Do something if this fails
+    AppParamsManager::loadParams("config.xml", this->appParams);
+    if (!this->appParams.targetHistogram.empty())
+        this->targetDetector.updateTargetHistogram(appParams.targetHistogram);
 
     /*TimerManager timers;
     timers.addCheckpoint(CAPTURE_CHECKPOINT);
@@ -94,22 +98,22 @@ void DesktopTest::initialize()
     namedWindow("Histogram render", CV_WINDOW_NORMAL);
 
     namedWindow("Config", CV_WINDOW_NORMAL);
-    createTrackbar("H min", "Config", &hMin, 180);
-    createTrackbar("H max", "Config", &hMax, 180);
-    createTrackbar("S min", "Config", &sMin, 255);
-    createTrackbar("S max", "Config", &sMax, 255);
-    createTrackbar("V min", "Config", &vMin, 255);
-    createTrackbar("V max", "Config", &vMax, 255);
+    createTrackbar("H min", "Config", &appParams.threshHMin, 180);
+    createTrackbar("H max", "Config", &appParams.threshHMax, 180);
+    createTrackbar("S min", "Config", &appParams.threshSMin, 255);
+    createTrackbar("S max", "Config", &appParams.threshSMax, 255);
+    createTrackbar("V min", "Config", &appParams.threshVMin, 255);
+    createTrackbar("V max", "Config", &appParams.threshVMax, 255);
     createTrackbar("Disable sat", "Config", nullptr, 1, &(DesktopTest::setBoolCallback), &excludeSaturationInHist);
-    createTrackbar("Enable thresh", "Config", nullptr, 1, &(DesktopTest::setBoolCallback), &enableThreshold);
+    createTrackbar("Enable thresh", "Config", nullptr, 1, &(DesktopTest::setBoolCallback), &appParams.enableHsvThreshold);
     createTrackbar("Disable imshow", "Config", nullptr, 1, &(DesktopTest::setBoolCallback), &disableImshow);
 
     
     setMouseCallback("Source", this->onMouse, &selectedTarget);
 
-    createTrackbar("Blur size", "Config", &detectorParams.blurSize, 60);
-    createTrackbar("Blur s", "Config", &detectorParams.blurSigma, 60);
-    createTrackbar("Thresh", "Config", &detectorParams.toZeroThresh, 100);
+    createTrackbar("Blur size", "Config", &appParams.blurSize, 60);
+    createTrackbar("Blur s", "Config", &appParams.blurSigma, 60);
+    createTrackbar("Thresh", "Config", &appParams.toZeroThresh, 100);
 }
 
 void DesktopTest::processFrame(uint32_t frameNumber, cv::Mat newFrame)
@@ -121,8 +125,8 @@ void DesktopTest::processFrame(uint32_t frameNumber, cv::Mat newFrame)
 
     //timers.markCheckpoint(CVT_COLOR_CHECKPOINT);
 
-    if (enableThreshold)
-        inRange(hsvFrame, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), threshFrame);
+    if (appParams.enableHsvThreshold)
+        inRange(hsvFrame, Scalar(appParams.threshHMin, appParams.threshSMin, appParams.threshVMin), Scalar(appParams.threshHMax, appParams.threshSMax, appParams.threshVMax), threshFrame);
 
     // timers.markCheckpoint(THRESH_CHECKPOINT);
 
@@ -135,7 +139,9 @@ void DesktopTest::processFrame(uint32_t frameNumber, cv::Mat newFrame)
 
         Mat calculatedHistogram;
         ColorBasedTargetDetector::calculateHistFromTarget(calculatedHistogram, excludeSaturationInHist ? TRACKER_HUE : TRACKER_HUE_SAT, sourceRoi, maskRoi);
-        this->targetDetector.updateTargetHistogram(calculatedHistogram);
+        
+        appParams.targetHistogram = calculatedHistogram;
+        this->targetDetector.updateTargetHistogram(appParams.targetHistogram);
 
         // TODO: Re-write histogram render for 2d histogram with sat
         //std::cout << targetColorHistogram << std::endl;
@@ -154,7 +160,7 @@ void DesktopTest::processFrame(uint32_t frameNumber, cv::Mat newFrame)
 
     if (targetDetector.hasTargetTraining())
     {
-        targetDetector.updateTracking(hsvFrame, cv::getTickCount(), detectorParams, threshFrame);
+        targetDetector.updateTracking(hsvFrame, cv::getTickCount(), appParams, threshFrame);
 
         if (!disableImshow)
         {
@@ -187,8 +193,15 @@ void DesktopTest::processFrame(uint32_t frameNumber, cv::Mat newFrame)
     if (!disableImshow || !targetDetector.hasTargetTraining())
         imshow("Source", newFrame);
 
-    if (!disableImshow && enableThreshold)
+    if (!disableImshow && appParams.enableHsvThreshold)
         imshow("Thresh", threshFrame);
 
-    waitKey(1);
+    if (waitKey(1) == 's')
+    {
+        // TODO: Use global struct with environment paths
+        if (AppParamsManager::saveParams("config.xml", this->appParams))
+            printf("\r\nSuccessfully saved params\r\n");
+        else
+            printf("\r\nError while saving params!\n");
+    }
 }

@@ -11,7 +11,7 @@
 
 int main(int argc, const char* argv[])
 {
-    IMainApplication* app = (argc > 1 && argv[1] == "--with-gui") ? (IMainApplication*)new DesktopTest() : (IMainApplication*)new HeadlessApp();
+    IMainApplication* app = (argc > 1 && std::string(argv[1]) == std::string("--with-gui")) ? (IMainApplication*)new DesktopTest() : (IMainApplication*)new HeadlessApp();
 
     app->initialize();
 
