@@ -35,8 +35,8 @@ void HeadlessApp::processFrame(uint32_t frameNumber, cv::Mat newFrame)
     if (targetDetector.hasTargetTraining())
     {
         targetDetector.updateTracking(hsvFrame, cv::getTickCount(), appParams, threshFrame);
-        robotComms->sendTrackedTargets(targetDetector.getTrackedTargets);
-    }
+        robotComms->sendTrackedTargets(targetDetector.getTrackedTargets());
+	}
     else
     {
         // TODO: Log error
