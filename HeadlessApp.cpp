@@ -8,6 +8,16 @@
 
 using namespace cv;
 
+HeadlessApp::HeadlessApp()
+{
+    robotComms = new RobotComms(this->commServerAddress, this->commServerPort);
+}
+
+HeadlessApp::~HeadlessApp()
+{
+    delete robotComms;
+}
+
 void HeadlessApp::initialize()
 {
     AppParamsManager::loadParams("config.xml", appParams);
@@ -24,7 +34,8 @@ void HeadlessApp::processFrame(uint32_t frameNumber, cv::Mat newFrame)
 
     if (targetDetector.hasTargetTraining())
     {
-        targetDetector.updateTracking(hsvFrame, cv::getTickCount(), detectorParams, threshFrame);
+        targetDetector.updateTracking(hsvFrame, cv::getTickCount(), appParams, threshFrame);
+        robotComms->sendTrackedTargets(targetDetector.getTrackedTargets);
     }
     else
     {

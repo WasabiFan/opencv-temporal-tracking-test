@@ -7,6 +7,7 @@
 #include "ColorBasedTargetDetector.h"
 #include "DesktopTest.h"
 #include "AppParamsManager.h"
+//#include "RobotComms.h"
 
 using namespace cv;
 
@@ -18,7 +19,6 @@ using namespace cv;
 #define CAM_SHIFT_CHECKPOINT "Cam shift"
 #define BLOB_DETECT_CHECKPOINT "Blob detect"
 #define RENDER_CHECKPOINT "Render GUI"
-
 
 void DesktopTest::setBoolCallback(int pos, void* userData)
 {
@@ -74,6 +74,16 @@ void DesktopTest::renderHueHistogram(Mat hueHistogram, Mat& histogramRender, int
             Point((i + 1) * binWidth, histogramRender.rows - val),
             Scalar(buf.at<Vec3b>(i)), -1, 8);
     }
+}
+
+DesktopTest::DesktopTest()
+{
+    robotComms = new RobotComms(this->commServerAddress, this->commServerPort);
+}
+
+DesktopTest::~DesktopTest()
+{
+    delete robotComms;
 }
 
 void DesktopTest::initialize()
@@ -161,6 +171,8 @@ void DesktopTest::processFrame(uint32_t frameNumber, cv::Mat newFrame)
     if (targetDetector.hasTargetTraining())
     {
         targetDetector.updateTracking(hsvFrame, cv::getTickCount(), appParams, threshFrame);
+
+        robotComms->sendTrackedTargets(targetDetector.getTrackedTargets());
 
         if (!disableImshow)
         {

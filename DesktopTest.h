@@ -3,11 +3,15 @@
 #include "IMainApplication.h"
 #include "ColorBasedTargetDetector.h"
 #include "AppParamsManager.h"
+#include "RobotComms.h"
 #include <opencv2/opencv.hpp>
 
 class DesktopTest : public IMainApplication
 {
 public:
+    DesktopTest();
+    ~DesktopTest();
+
     virtual void initialize() override;
     virtual void processFrame(uint32_t frameNumber, cv::Mat newFrame) override;
 
@@ -25,10 +29,14 @@ private:
     cv::Mat histogramRender;
     cv::Mat dbgBackprojFrame;
 
+    const string commServerAddress = "127.0.0.1";
+    const unsigned short commServerPort = 3000;
+
     // 1 second prune time threshold
     const int64 targetPruneTime = (int64)(cv::getTickFrequency() * 1);
 
     ColorBasedTargetDetector targetDetector = ColorBasedTargetDetector(this->targetPruneTime, 5);
+    RobotComms* robotComms = nullptr;
 
     static void setBoolCallback(int pos, void* userData);
     static void onMouse(int event, int x, int y, int flags, void* userData);

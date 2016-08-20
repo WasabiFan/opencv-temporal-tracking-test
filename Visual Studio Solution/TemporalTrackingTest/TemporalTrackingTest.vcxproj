@@ -24,7 +24,9 @@
     <ClCompile Include="..\..\FpsCounter.cpp" />
     <ClCompile Include="..\..\DesktopTest.cpp" />
     <ClCompile Include="..\..\HeadlessApp.cpp" />
+    <ClCompile Include="..\..\lib\PracticalSocket.cpp" />
     <ClCompile Include="..\..\Main.cpp" />
+    <ClCompile Include="..\..\RobotComms.cpp" />
     <ClCompile Include="..\..\TimeUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -34,6 +36,9 @@
     <ClInclude Include="..\..\FpsCounter.h" />
     <ClInclude Include="..\..\HeadlessApp.h" />
     <ClInclude Include="..\..\IMainApplication.h" />
+    <ClInclude Include="..\..\lib\json.h" />
+    <ClInclude Include="..\..\lib\PracticalSocket.h" />
+    <ClInclude Include="..\..\RobotComms.h" />
     <ClInclude Include="..\..\TimeUtils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -126,7 +131,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(OPENCV2_VS2015_DIR)\..\..\include</AdditionalIncludeDirectories>
     </ClCompile>
@@ -134,7 +139,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OPENCV2_VS2015_DIR)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_highgui%OPENCV2_VS2015_VER%d.lib;opencv_core%OPENCV2_VS2015_VER%d.lib;opencv_imgproc%OPENCV2_VS2015_VER%d.lib;opencv_video%OPENCV2_VS2015_VER%d.lib;opencv_objdetect%OPENCV2_VS2015_VER%d.lib;opencv_features2d%OPENCV2_VS2015_VER%d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;opencv_highgui%OPENCV2_VS2015_VER%d.lib;opencv_core%OPENCV2_VS2015_VER%d.lib;opencv_imgproc%OPENCV2_VS2015_VER%d.lib;opencv_video%OPENCV2_VS2015_VER%d.lib;opencv_objdetect%OPENCV2_VS2015_VER%d.lib;opencv_features2d%OPENCV2_VS2015_VER%d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
