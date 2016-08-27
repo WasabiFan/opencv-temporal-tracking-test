@@ -179,7 +179,7 @@ void DesktopTest::processFrame(uint32_t frameNumber, cv::Mat newFrame)
             for (auto trackedTarget : targetDetector.getTrackedTargets())
             {
                 if (trackedTarget->lastTrackedPose.size.area() > 0)
-                    ellipse(newFrame, trackedTarget->lastTrackedPose, Scalar(255, 0, 255), 1);
+                    ellipse(newFrame, trackedTarget->lastTrackedPose, trackedTarget->isTracked? Scalar(255, 0, 255) : Scalar(255,255,0) , 1);
             }
         }
 

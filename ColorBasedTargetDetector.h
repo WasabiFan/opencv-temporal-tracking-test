@@ -8,6 +8,7 @@ struct TargetBoundaryInfo
     std::shared_ptr<cv::Rect> targetBounds;
     cv::RotatedRect lastTrackedPose;
     int64 lastDetectedTime = -1;
+	bool isTracked = false;
 };
 
 enum TrackerMode
@@ -31,6 +32,7 @@ private:
     int64_t targetPruneTimeThresh;
     uint16_t trackingUpdateInterval;
     uint64_t frameNum = 0;
+	std::shared_ptr<TargetBoundaryInfo> selectedTarget = nullptr; 
 
     cv::Mat backprojFrameBuf;
     cv::Mat targetHistogram;
@@ -60,6 +62,7 @@ public:
     void updateTracking(cv::Mat newFrame, int64_t currentTime, Params trackingParams = Params(), cv::Mat mask = cv::Mat());
     std::vector<std::shared_ptr<TargetBoundaryInfo>> getTrackedTargets();
     void getLastBackprojFrame(cv::Mat& outBackprojFrame);
+	std::shared_ptr<TargetBoundaryInfo> selectTarget(); 
 
     ~ColorBasedTargetDetector();
 };
