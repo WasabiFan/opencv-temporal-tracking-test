@@ -26,3 +26,4 @@ double FpsCounter::getFps()
 {
     return lastFps;
 }
+
