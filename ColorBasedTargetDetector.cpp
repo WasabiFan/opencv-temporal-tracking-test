@@ -69,6 +69,9 @@ void ColorBasedTargetDetector::updateTargetCorrelation(std::vector<cv::KeyPoint>
 
         trackedTargets.push_back(newTarget);
     }
+
+	if (trackedTargets.size() > maxTargets)
+		trackedTargets.clear();
 }
 
 void ColorBasedTargetDetector::calculateHistFromTarget(cv::Mat& outHistogram, TrackerMode histMode, cv::Mat targetImage, cv::Mat targetMask)
