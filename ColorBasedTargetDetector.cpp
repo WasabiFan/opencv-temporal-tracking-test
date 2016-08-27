@@ -174,16 +174,11 @@ std::shared_ptr<TargetBoundaryInfo> ColorBasedTargetDetector::selectTarget(std::
 	{
 		if (selectedTarget == trackedTargets[i])
 			return selectedTarget;
-	}
 
-	for (auto trackedtarget : trackedTargets)
-	{
 		if (largestTarget == nullptr)
-			largestTarget = trackedtarget;
-		else if (largestTarget->targetBounds->area() < trackedtarget->targetBounds->area())
-		{
-			largestTarget = trackedtarget;
-		}
+			largestTarget = trackedTargets[i];
+		else if (largestTarget->targetBounds->area() < trackedTargets[i]->targetBounds->area())
+			largestTarget = trackedTargets[i];
 	}
 
 	largestTarget->isTracked = true;
