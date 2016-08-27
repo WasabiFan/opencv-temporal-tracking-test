@@ -32,7 +32,7 @@ private:
     int64_t targetPruneTimeThresh;
     uint16_t trackingUpdateInterval;
 	uint64_t frameNum = 0;
-	uint16_t maxTargets = 50;
+	uint16_t maxTargets = 20;
 	std::shared_ptr<TargetBoundaryInfo> selectedTarget = nullptr; 
 
     cv::Mat backprojFrameBuf;
