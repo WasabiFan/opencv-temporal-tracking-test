@@ -62,7 +62,7 @@ public:
     void updateTracking(cv::Mat newFrame, int64_t currentTime, Params trackingParams = Params(), cv::Mat mask = cv::Mat());
     std::vector<std::shared_ptr<TargetBoundaryInfo>> getTrackedTargets();
     void getLastBackprojFrame(cv::Mat& outBackprojFrame);
-	std::shared_ptr<TargetBoundaryInfo> selectTarget(); 
+	std::shared_ptr<TargetBoundaryInfo> selectTarget(std::shared_ptr<TargetBoundaryInfo> selectedTarget);
 
     ~ColorBasedTargetDetector();
 };

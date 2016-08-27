@@ -149,11 +149,8 @@ void ColorBasedTargetDetector::updateTracking(cv::Mat newFrame, int64_t currentT
             trackedTarget->lastTrackedPose = CamShift(backprojFrameBuf, *trackedTarget->targetBounds.get(),
                 cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 10, 1));
     }
-
-	if (selectedTarget == nullptr )
-	{
-		selectedTarget = selectTarget();
-	}
+	
+	selectedTarget = selectTarget(selectedTarget);
 }
 
 std::vector<std::shared_ptr<TargetBoundaryInfo>> ColorBasedTargetDetector::getTrackedTargets()
@@ -166,12 +163,18 @@ void ColorBasedTargetDetector::getLastBackprojFrame(cv::Mat& outBackprojFrame)
     outBackprojFrame = backprojFrameBuf;
 }
 
-std::shared_ptr<TargetBoundaryInfo> ColorBasedTargetDetector::selectTarget()
+std::shared_ptr<TargetBoundaryInfo> ColorBasedTargetDetector::selectTarget(std::shared_ptr<TargetBoundaryInfo> selectedTarget)
 {
 	std::shared_ptr<TargetBoundaryInfo> largestTarget = nullptr;
 	
 	if(trackedTargets.size() == 0)
 		return nullptr;
+
+	for (int i = 0; i < trackedTargets.size(); ++i)
+	{
+		if (selectedTarget == trackedTargets[i])
+			return selectedTarget;
+	}
 
 	for (auto trackedtarget : trackedTargets)
 	{
