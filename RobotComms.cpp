@@ -37,7 +37,8 @@ void RobotComms::sendTrackedTargets(std::vector<std::shared_ptr<TargetBoundaryIn
             { "width", target->lastTrackedPose.size.width },
             { "height", target->lastTrackedPose.size.height },
             { "angle", target->lastTrackedPose.angle },
-            { "isTracked", target->isTracked }
+            { "isTracked", target->isTracked },
+			{ "xOffset", target->xOffset }
         };
 
         packetData["trackedTargets"].push_back(targetObj);
