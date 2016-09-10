@@ -18,6 +18,9 @@ int main(int argc, const char* argv[])
     FpsCounter fpsCounter = FpsCounter(10);
     cv::VideoCapture capture(0);
 
+    if (!capture.isOpened())
+        throw std::exception("Capture not successfully opened!");
+
     cv::Mat sourceFrame;
     for (uint32_t frameNumber = 0; capture.isOpened(); frameNumber++)
     {
