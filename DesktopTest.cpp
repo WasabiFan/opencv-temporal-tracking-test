@@ -128,6 +128,12 @@ void DesktopTest::initialize()
 
 void DesktopTest::processFrame(uint32_t frameNumber, cv::Mat newFrame)
 {
+	if (!frameSizeSet)
+	{
+		frameSizeSet = true;
+		this->targetDetector.setFrameSize(newFrame.cols, newFrame.rows);
+	}
+
     //timers.markCheckpoint(CAPTURE_CHECKPOINT);
 
     //medianBlur(sourceFrame, sourceFrame, 5);

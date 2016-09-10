@@ -8,6 +8,7 @@ struct TargetBoundaryInfo
     std::shared_ptr<cv::Rect> targetBounds;
     cv::RotatedRect lastTrackedPose;
     int64 lastDetectedTime = -1;
+	float_t xOffset = 0; 
 	bool isTracked = false;
 };
 
@@ -33,6 +34,8 @@ private:
     uint16_t trackingUpdateInterval;
 	uint64_t frameNum = 0;
 	uint16_t maxTargets = 20;
+	uint16_t frameWidth = 0;
+	uint16_t frameHeight = 0;
 	std::shared_ptr<TargetBoundaryInfo> selectedTarget = nullptr; 
 
     cv::Mat backprojFrameBuf;
@@ -41,6 +44,7 @@ private:
     // Use shared_ptr to make it easy to dynamically modify struct values
     std::vector<std::shared_ptr<TargetBoundaryInfo>> trackedTargets;
     cv::SimpleBlobDetector blobDetector;
+	float_t getXOffset(std::shared_ptr<TargetBoundaryInfo> target);
 
     void updateTargetCorrelation(std::vector<cv::KeyPoint> detectedBlobs, int64_t currentTime);
 
@@ -64,6 +68,7 @@ public:
     std::vector<std::shared_ptr<TargetBoundaryInfo>> getTrackedTargets();
     void getLastBackprojFrame(cv::Mat& outBackprojFrame);
 	std::shared_ptr<TargetBoundaryInfo> selectTarget(std::shared_ptr<TargetBoundaryInfo> selectedTarget);
+	void setFrameSize(uint16_t width, uint16_t height);
 
     ~ColorBasedTargetDetector();
 };
