@@ -26,9 +26,9 @@ const int ColorBasedTargetDetector::numHueBins = 30;
 const int ColorBasedTargetDetector::numSatBins = 16;
 const int ColorBasedTargetDetector::histogramNumBins[] = { numHueBins, numSatBins };
 
-float_t ColorBasedTargetDetector::getXOffset(std::shared_ptr<TargetBoundaryInfo> target)
+float_t ColorBasedTargetDetector::calcOffset(float_t targetDim, float_t maxFrameDim)
 {
-	return (float((target->targetBounds->x * 2)) / float(frameWidth)) - 1;
+	return (float(targetDim * 2) / maxFrameDim) - 1;
 }
 
 void ColorBasedTargetDetector::updateTargetCorrelation(std::vector<cv::KeyPoint> detectedBlobs, int64_t currentTime)
@@ -190,8 +190,11 @@ std::shared_ptr<TargetBoundaryInfo> ColorBasedTargetDetector::selectTarget(std::
 	}
 
 	largestTarget->isTracked = true;
-	if (frameWidth != 0)
-		largestTarget->xOffset = getXOffset(largestTarget);
+	if (frameWidth > 0 && frameHeight > 0)
+	{
+		largestTarget->xOffset = calcOffset(largestTarget->targetBounds->x, frameWidth);
+		largestTarget->yOffset = calcOffset(largestTarget->targetBounds->y, frameHeight);
+	}
 	return largestTarget;
 }
 

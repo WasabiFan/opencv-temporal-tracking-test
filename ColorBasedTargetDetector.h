@@ -9,6 +9,7 @@ struct TargetBoundaryInfo
     cv::RotatedRect lastTrackedPose;
     int64 lastDetectedTime = -1;
 	float_t xOffset = 0; 
+	float_t yOffset = 0; 
 	bool isTracked = false;
 };
 
@@ -44,7 +45,7 @@ private:
     // Use shared_ptr to make it easy to dynamically modify struct values
     std::vector<std::shared_ptr<TargetBoundaryInfo>> trackedTargets;
     cv::SimpleBlobDetector blobDetector;
-	float_t getXOffset(std::shared_ptr<TargetBoundaryInfo> target);
+	float_t calcOffset(float_t targetDim, float_t maxFrameDim);
 
     void updateTargetCorrelation(std::vector<cv::KeyPoint> detectedBlobs, int64_t currentTime);
 
