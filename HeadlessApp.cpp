@@ -27,6 +27,12 @@ void HeadlessApp::initialize()
 
 void HeadlessApp::processFrame(uint32_t frameNumber, cv::Mat newFrame)
 {
+	if (!frameSizeSet)
+	{
+		frameSizeSet = true; 
+		this->targetDetector.setFrameSize(newFrame.cols, newFrame.rows);
+	}
+
     cvtColor(newFrame, hsvFrame, CV_BGR2HSV);
 
     if (appParams.enableHsvThreshold)

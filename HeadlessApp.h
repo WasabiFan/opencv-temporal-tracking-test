@@ -19,6 +19,8 @@ private:
 
     AppParams appParams;
     
+	bool frameSizeSet = false;
+
     cv::Mat hsvFrame;
     cv::Mat threshFrame;
 

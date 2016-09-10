@@ -21,6 +21,7 @@ private:
     // These must start as false, otherwise the trackbar won't match the value.
     bool excludeSaturationInHist = false;
     bool disableImshow = false;
+	bool frameSizeSet = false;
 
     cv::Rect* selectedTarget = nullptr;
     
