@@ -30,7 +30,7 @@ private:
     cv::Mat histogramRender;
     cv::Mat dbgBackprojFrame;
 
-    const string commServerAddress = "127.0.0.1";
+    const string commServerAddress = "roborio-488-frc.local";
     const unsigned short commServerPort = 3000;
 
     // 1 second prune time threshold
