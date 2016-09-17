@@ -22,8 +22,8 @@ const int ColorBasedTargetDetector::histogramChannels[] = { 0, 1 };
 const float ColorBasedTargetDetector::hueRange[] = { 0, 179 };
 const float ColorBasedTargetDetector::satRange[] = { 0, 255 };
 const float* const ColorBasedTargetDetector::histogramRanges[] = { hueRange, satRange };
-const int ColorBasedTargetDetector::numHueBins = 30;
-const int ColorBasedTargetDetector::numSatBins = 16;
+const int ColorBasedTargetDetector::numHueBins = 20;
+const int ColorBasedTargetDetector::numSatBins = 8;
 const int ColorBasedTargetDetector::histogramNumBins[] = { numHueBins, numSatBins };
 
 float_t ColorBasedTargetDetector::calcOffset(float_t targetDim, float_t maxFrameDim)
@@ -80,7 +80,7 @@ void ColorBasedTargetDetector::calculateHistFromTarget(cv::Mat& outHistogram, Tr
 {
     if (histMode == TRACKER_NONE)
     {
-        throw std::exception("Cannot calculate tracker histogram without a specified mode!");
+        //throw std::exception("Cannot calculate tracker histogram without a specified mode!");
     }
 
     // TODO: I'm pretty sure that casting a const to a non-const is bad
@@ -127,8 +127,8 @@ bool ColorBasedTargetDetector::hasTargetTraining()
 
 void ColorBasedTargetDetector::updateTracking(cv::Mat newFrame, int64_t currentTime, Params trackingParams, cv::Mat mask)
 {
-    if (targetHistogram.empty())
-        throw std::exception("A histogram must be calculated and loaded before tracking can be executed.");
+    //if (targetHistogram.empty())
+      //  throw std::exception("A histogram must be calculated and loaded before tracking can be executed.");
 
     cv::calcBackProject(&newFrame, 1, histogramChannels, targetHistogram, backprojFrameBuf, (const float**)histogramRanges);
     if (!mask.empty())

@@ -22,6 +22,11 @@ do
 done
 
 # TODO: Ping to confirm host exists
+#DATE=$(date)
+#echo "$DATE"
+#ssh $TARGET_USER_NAME@$TARGET_HOST sudo date --set "$DATE"
+
+#exit 0
 
 ssh $TARGET_USER_NAME@$TARGET_HOST mkdir -p "$DEST_DIR"
 rsync -azvv -e ssh --exclude=.git --exclude=build --exclude='Visual Studio Solution' --exclude='*~' --exclude='.gitignore' $SOURCE_DIR/ $TARGET_USER_NAME@$TARGET_HOST:$DEST_DIR

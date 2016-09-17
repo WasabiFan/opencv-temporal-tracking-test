@@ -56,6 +56,7 @@ public:
         int blurSize = 31;
         int blurSigma = 15;
         int toZeroThresh = 10;
+        Params() {}
     };
 
     static void calculateHistFromTarget(cv::Mat& outHistogram, TrackerMode histMode, cv::Mat targetImage, cv::Mat targetMask = cv::Mat());
