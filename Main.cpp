@@ -8,6 +8,7 @@
 #include "HeadlessApp.h"
 
 #include <opencv2/opencv.hpp>
+#include <stdexcept>
 
 int main(int argc, const char* argv[])
 {
@@ -18,8 +19,8 @@ int main(int argc, const char* argv[])
     FpsCounter fpsCounter = FpsCounter(10);
     cv::VideoCapture capture(0);
 
-    //if (!capture.isOpened())
-        //throw std::exception("Capture not successfully opened!");
+    if (!capture.isOpened())
+        throw std::runtime_error("Capture not successfully opened!");
 
     cv::Mat sourceFrame;
     for (uint32_t frameNumber = 0; capture.isOpened(); frameNumber++)

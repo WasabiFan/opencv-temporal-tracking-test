@@ -1,4 +1,5 @@
 #include "ColorBasedTargetDetector.h"
+#include <stdexcept>
 
 /*
 NOTES:
@@ -26,7 +27,7 @@ const int ColorBasedTargetDetector::numHueBins = 20;
 const int ColorBasedTargetDetector::numSatBins = 8;
 const int ColorBasedTargetDetector::histogramNumBins[] = { numHueBins, numSatBins };
 
-float_t ColorBasedTargetDetector::calcOffset(float_t targetDim, float_t maxFrameDim)
+float ColorBasedTargetDetector::calcOffset(float targetDim, float maxFrameDim)
 {
 	return (float(targetDim * 2) / maxFrameDim) - 1;
 }
@@ -80,7 +81,7 @@ void ColorBasedTargetDetector::calculateHistFromTarget(cv::Mat& outHistogram, Tr
 {
     if (histMode == TRACKER_NONE)
     {
-        //throw std::exception("Cannot calculate tracker histogram without a specified mode!");
+        throw std::runtime_error("Cannot calculate tracker histogram without a specified mode!");
     }
 
     // TODO: I'm pretty sure that casting a const to a non-const is bad
@@ -127,8 +128,8 @@ bool ColorBasedTargetDetector::hasTargetTraining()
 
 void ColorBasedTargetDetector::updateTracking(cv::Mat newFrame, int64_t currentTime, Params trackingParams, cv::Mat mask)
 {
-    //if (targetHistogram.empty())
-      //  throw std::exception("A histogram must be calculated and loaded before tracking can be executed.");
+    if (targetHistogram.empty())
+        throw std::runtime_error("A histogram must be calculated and loaded before tracking can be executed.");
 
     cv::calcBackProject(&newFrame, 1, histogramChannels, targetHistogram, backprojFrameBuf, (const float**)histogramRanges);
     if (!mask.empty())
@@ -156,6 +157,12 @@ void ColorBasedTargetDetector::updateTracking(cv::Mat newFrame, int64_t currentT
         if (trackedTarget->targetBounds->area() > 0)
             trackedTarget->lastTrackedPose = CamShift(backprojFrameBuf, *trackedTarget->targetBounds.get(),
                 cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 10, 1));
+
+        if (frameWidth > 0 && frameHeight > 0)
+	    {
+		    trackedTarget->xOffset = calcOffset(trackedTarget->targetBounds->x, frameWidth);
+		    trackedTarget->yOffset = calcOffset(trackedTarget->targetBounds->y, frameHeight);
+	    }
     }
 	
 	selectedTarget = selectTarget(selectedTarget);
@@ -190,11 +197,6 @@ std::shared_ptr<TargetBoundaryInfo> ColorBasedTargetDetector::selectTarget(std::
 	}
 
 	largestTarget->isTracked = true;
-	if (frameWidth > 0 && frameHeight > 0)
-	{
-		largestTarget->xOffset = calcOffset(largestTarget->targetBounds->x, frameWidth);
-		largestTarget->yOffset = calcOffset(largestTarget->targetBounds->y, frameHeight);
-	}
 	return largestTarget;
 }
 
