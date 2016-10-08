@@ -12,7 +12,9 @@
 
 int main(int argc, const char* argv[])
 {
-    IMainApplication* app = (argc > 1 && std::string(argv[1]) == std::string("--with-gui")) ? (IMainApplication*)new DesktopTest() : (IMainApplication*)new HeadlessApp();
+	bool isHeadless = (argc > 1 && std::string(argv[1]) == std::string("--with-gui")) ? true : false;
+
+	IMainApplication* app = isHeadless ? (IMainApplication*)new DesktopTest() : (IMainApplication*)new HeadlessApp();
 
     app->initialize();
 
@@ -30,6 +32,7 @@ int main(int argc, const char* argv[])
         capture >> sourceFrame;
         app->processFrame(frameNumber, sourceFrame);
 
-        printf("\r%.1f FPS", fpsCounter.getFps());
+		if(!isHeadless)
+			printf("\r%.1f FPS", fpsCounter.getFps());
     }
 }
