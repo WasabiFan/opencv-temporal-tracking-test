@@ -128,6 +128,7 @@ void DesktopTest::initialize()
 
 void DesktopTest::processFrame(uint32_t frameNumber, cv::Mat newFrame)
 {
+	
 	if (!frameSizeSet)
 	{
 		frameSizeSet = true;
@@ -135,6 +136,9 @@ void DesktopTest::processFrame(uint32_t frameNumber, cv::Mat newFrame)
 	}
 
     //timers.markCheckpoint(CAPTURE_CHECKPOINT);
+
+	//Equalize color histogram
+	newFrame = this->targetDetector.equalizeIntensity(newFrame);
 
     //medianBlur(sourceFrame, sourceFrame, 5);
     cvtColor(newFrame, hsvFrame, CV_BGR2HSV);
@@ -184,8 +188,13 @@ void DesktopTest::processFrame(uint32_t frameNumber, cv::Mat newFrame)
         {
             for (auto trackedTarget : targetDetector.getTrackedTargets())
             {
-                if (trackedTarget->lastTrackedPose.size.area() > 0)
-                    ellipse(newFrame, trackedTarget->lastTrackedPose, trackedTarget->isTracked? Scalar(255, 0, 255) : Scalar(255,255,0) , 1);
+				if (trackedTarget->lastTrackedPose.size.area() > 0)
+				{
+					if (trackedTarget->isTracked)
+						ellipse(newFrame, trackedTarget->lastTrackedPose, Scalar(255, 0, 255), 5);
+					else
+						ellipse(newFrame, trackedTarget->lastTrackedPose, Scalar(255, 255, 0), 1);
+				}
             }
         }
 
