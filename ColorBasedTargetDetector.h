@@ -59,6 +59,8 @@ public:
         Params() {}
     };
 
+	cv::Mat equalizeIntensity(cv::Mat& inputImage); 
+
     static void calculateHistFromTarget(cv::Mat& outHistogram, TrackerMode histMode, cv::Mat targetImage, cv::Mat targetMask = cv::Mat());
 
     ColorBasedTargetDetector(int64_t targetPruneTimeThresh, uint16_t trackingUpdateInterval);

@@ -34,47 +34,66 @@ float ColorBasedTargetDetector::calcOffset(float targetDim, float maxFrameDim)
 
 void ColorBasedTargetDetector::updateTargetCorrelation(std::vector<cv::KeyPoint> detectedBlobs, int64_t currentTime)
 {
-    //TODO: Add logging
-    std::vector<cv::KeyPoint> unpairedBlobs = detectedBlobs;
-    std::vector<std::shared_ptr<TargetBoundaryInfo>> unpairedTargets = trackedTargets;
-    for (cv::KeyPoint blob : detectedBlobs)
-    {
-        for (std::shared_ptr<TargetBoundaryInfo> target : unpairedTargets)
-        {
-            // TODO: Check for overlap with keypoint diameter as well
-            if (target->targetBounds->contains(blob.pt))
-            {
-                target->lastDetectedTime = currentTime;
-                unpairedTargets.erase(std::remove(unpairedTargets.begin(), unpairedTargets.end(), target), unpairedTargets.end());
+	//TODO: Add logging
+	std::vector<cv::KeyPoint> unpairedBlobs = detectedBlobs;
+	std::vector<std::shared_ptr<TargetBoundaryInfo>> unpairedTargets = trackedTargets;
+	for (cv::KeyPoint blob : detectedBlobs)
+	{
+		for (std::shared_ptr<TargetBoundaryInfo> target : unpairedTargets)
+		{
+			// TODO: Check for overlap with keypoint diameter as well
+			if (target->targetBounds->contains(blob.pt))
+			{
+				target->lastDetectedTime = currentTime;
+				unpairedTargets.erase(std::remove(unpairedTargets.begin(), unpairedTargets.end(), target), unpairedTargets.end());
 
-                // KeyPoint doesn't define a == operator
-                for (int i = 0; i < unpairedBlobs.size(); i++)
-                    if (unpairedBlobs[i] == blob)
-                        unpairedBlobs.erase(std::next(unpairedBlobs.begin(), i));
+				// KeyPoint doesn't define a == operator
+				for (int i = 0; i < unpairedBlobs.size(); i++)
+					if (unpairedBlobs[i] == blob)
+						unpairedBlobs.erase(std::next(unpairedBlobs.begin(), i));
 
-                break;
-            }
-        }
-    }
+				break;
+			}
+		}
+	}
 
-    for (std::shared_ptr<TargetBoundaryInfo> unpairedTarget : unpairedTargets)
-    {
-        if (currentTime - unpairedTarget->lastDetectedTime >= targetPruneTimeThresh)
-            trackedTargets.erase(std::remove(trackedTargets.begin(), trackedTargets.end(), unpairedTarget), trackedTargets.end());
-    }
+	for (std::shared_ptr<TargetBoundaryInfo> unpairedTarget : unpairedTargets)
+	{
+		if (currentTime - unpairedTarget->lastDetectedTime >= targetPruneTimeThresh)
+			trackedTargets.erase(std::remove(trackedTargets.begin(), trackedTargets.end(), unpairedTarget), trackedTargets.end());
+	}
 
-    for (cv::KeyPoint unpairedBlob : unpairedBlobs)
-    {
-        auto newTarget = std::make_shared<TargetBoundaryInfo>();
-        newTarget->lastDetectedTime = currentTime;
-        newTarget->targetBounds = std::make_shared<cv::Rect>();
-        newTarget->targetBounds->x = (int)unpairedBlob.pt.x;
-        newTarget->targetBounds->y = (int)unpairedBlob.pt.y;
-        newTarget->targetBounds->width = (int)unpairedBlob.size;
-        newTarget->targetBounds->height = (int)unpairedBlob.size;
+	for (cv::KeyPoint unpairedBlob : unpairedBlobs)
+	{
+		auto newTarget = std::make_shared<TargetBoundaryInfo>();
+		newTarget->lastDetectedTime = currentTime;
+		newTarget->targetBounds = std::make_shared<cv::Rect>();
+		newTarget->targetBounds->x = (int)unpairedBlob.pt.x;
+		newTarget->targetBounds->y = (int)unpairedBlob.pt.y;
+		newTarget->targetBounds->width = (int)unpairedBlob.size;
+		newTarget->targetBounds->height = (int)unpairedBlob.size;
 
-        trackedTargets.push_back(newTarget);
-    }
+		trackedTargets.push_back(newTarget);
+	}
+}
+
+cv::Mat ColorBasedTargetDetector::equalizeIntensity(cv::Mat & inputImage)
+{
+	cv::Mat ycrcb;
+
+	cv::cvtColor(inputImage, ycrcb, CV_BGR2YCrCb);
+
+	cv::vector<cv::Mat> channels;
+	cv::split(ycrcb, channels);
+
+	cv::equalizeHist(channels[0], channels[0]);
+
+	cv::Mat result;
+	cv::merge(channels, ycrcb);
+
+	cv::cvtColor(ycrcb, result, CV_YCrCb2BGR);
+	
+	return result;
 }
 
 void ColorBasedTargetDetector::calculateHistFromTarget(cv::Mat& outHistogram, TrackerMode histMode, cv::Mat targetImage, cv::Mat targetMask)
