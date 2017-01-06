@@ -1,5 +1,9 @@
 # OpenCV Temporal Tracking Test Project 
 
+Test code to experiment with various tracking algorithms, intended to be run on an NVIDIA Jetson TK1. Can also be used on Linux and Windows PCs.
+
+**Note that we won't provide support for this code; it is not necessarily reflective of best practices nor is it guaranteed to be functional.**
+
 ## Setup: 
 Ensure you have openCV. Set Environment variables:
 
